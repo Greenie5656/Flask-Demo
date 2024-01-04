@@ -1,0 +1,16 @@
+<!-- templates/display_image.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Generated Image</title>
+</head>
+<body>
+    <h1>Here is your generated image:</h1>
+    <!-- Display the generated image -->
+    <img src="{{ image_url }}" alt="Generated Image">
+    <br>
+    <a href="{{ url_for('show_form') }}">Go back to the form</a>
+</body>
+</html>
