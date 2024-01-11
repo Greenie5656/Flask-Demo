@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from openai import OpenAI
+import openai
 import os
 
 app = Flask(__name__)
@@ -10,7 +10,7 @@ if not api_key:
     raise ValueError("OPENAI_API_KEY environment variable not set")
 
 # Instantiate OpenAI client with the retrieved API key
-client = OpenAI(api_key=api_key)
+client = openai.OpenAI(api_key=api_key)
 
 @app.route('/', methods=['GET'])  # Root URL
 def index():
@@ -20,10 +20,11 @@ def index():
 def handle_form_submission():
     prompt = request.form['prompt']
     try:
-        response = client.Image.create(
+        response = client.images.generate(
             prompt=prompt,
             n=1,
-            size="1024x1024"
+            size="1024x1024",
+            quality="standard"  # or "hd" for higher quality
         )
         # Adapt the following line based on the actual response structure
         image_url = response['data'][0]['url']
