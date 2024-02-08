@@ -1,36 +1,36 @@
 from flask import Flask, render_template, request, jsonify
-import openai
-import os
+from openai import OpenAI  # Make sure to import OpenAI
 
 app = Flask(__name__)
+client = OpenAI()  # Initialize the OpenAI client
 
-# Retrieve API key from environment variable
-api_key = os.getenv('OPENAI_API_KEY')
-if not api_key:
-    raise ValueError("OPENAI_API_KEY environment variable not set")
-
-# Instantiate OpenAI client with the retrieved API key
-client = openai.OpenAI(api_key=api_key)
-
-@app.route('/', methods=['GET'])  # Root URL
+@app.route('/')
 def index():
     return render_template('form.html')  # Render the form template
 
 @app.route('/submit', methods=['POST'])
 def handle_form_submission():
     prompt = request.form['prompt']
+
     try:
+        # Use the working code from sample.py for image generation
         response = client.images.generate(
+            model="dall-e-3",
             prompt=prompt,
-            n=1,
             size="1024x1024",
-            quality="standard"  # or "hd" for higher quality
+            quality="standard",
+            n=1,
         )
-        # Adapt the following line based on the actual response structure
-        image_url = response['data'][0]['url']
+        
+        # Extract the image URL from the response
+        image_url = response.data[0].url
+        
+        # Render the template to display the image
         return render_template('display_image.html', image_url=image_url)
+
     except Exception as e:
+        # Return a JSON response if an error occurs
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True)  # Run the Flask app
+    app.run(debug=True)
