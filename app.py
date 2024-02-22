@@ -1,12 +1,35 @@
 from flask import Flask, render_template, request, jsonify
 from openai import OpenAI  # Make sure to import OpenAI
+from flask_wtf import FlaskForm
+from wtforms import FileField, SubmitField  
+from werkzeug.utils import secure_filename
+import os
+
 
 app = Flask(__name__)
 client = OpenAI()  # Initialize the OpenAI client
 
+app.config["SECRET_KEY"] = "andrewgreen"
+app.config["UPLOAD_FOLDER"] = "static/files"
+
+class UploadFileForm(FlaskForm):
+    file = FileField("file")
+    submit = SubmitField("Upload File")
+
 @app.route('/')
 def index():
     return render_template('form.html')  # Render the form template
+
+@app.route('/test', methods=["GET", "POST"])
+def test():
+    form = UploadFileForm()
+    if form.validate_on_submit():
+        file = form.file.data # First grab the file
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return render_template('index.html', filename=filename, form=form)
+    return render_template('index.html', form=form )
+
 
 @app.route('/submit', methods=['POST'])
 def handle_form_submission():
